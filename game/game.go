@@ -13,6 +13,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/teeworlds-go/goofworlds/game/components"
 	"github.com/teeworlds-go/protocol/messages7"
 	"github.com/teeworlds-go/protocol/teeworlds7"
 )
@@ -86,6 +87,7 @@ type Game struct {
 	Fullscreen bool
 	Ip         string
 	Port       int
+	Components []components.Component
 }
 
 func (g *Game) Update() error {
