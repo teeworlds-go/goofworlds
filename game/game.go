@@ -125,6 +125,10 @@ func repeatingKeyPressed(key ebiten.Key) bool {
 	return false
 }
 
+func (inp *TextInput) Clear() {
+	inp.text = ""
+}
+
 func (inp *TextInput) Draw(screen *ebiten.Image) {
 	if inp.IsActive() == false {
 		return
@@ -191,12 +195,13 @@ func (g *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
 		g.Client.Game.Input.Jump = 1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+	if ebiten.IsKeyPressed(ebiten.KeyQ) && g.ChatInp.IsActive() == false {
 		g.Client.SendMessage(&messages7.CtrlClose{})
 		os.Exit(0)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyT) {
 		g.ChatInp.Activate()
+		g.ChatInp.Clear() // cursed hack to clear the T xd
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		g.Fullscreen = !g.Fullscreen
