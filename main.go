@@ -2,11 +2,14 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -85,6 +88,8 @@ type Game struct {
 	Client     teeworlds7.Client
 	Camera     Camera
 	Fullscreen bool
+	Ip         string
+	Port       int
 }
 
 func (g *Game) Update() error {
@@ -144,6 +149,21 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
+func ExecLine(line string, game *Game) {
+	if strings.HasPrefix(line, "connect ") {
+		fullIp := strings.Split(line, " ")[1]
+		game.Ip = strings.Split(fullIp, ":")[0]
+		var err error
+		game.Port, err = strconv.Atoi(strings.Split(fullIp, ":")[1])
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Printf("unknown command: %s\n", line)
+		os.Exit(1)
+	}
+}
+
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("goofworlds")
@@ -151,6 +171,13 @@ func main() {
 	game := &Game{}
 	game.Client = *teeworlds7.NewClient()
 	game.Client.Name = "goofy"
+	game.Ip = "127.0.0.1"
+	game.Port = 8303
+	if len(os.Args) == 2 {
+		ExecLine(os.Args[1], game)
+	} else if len(os.Args) > 2 {
+		panic(fmt.Errorf("more than 1 cli arg not supported got %d", len(os.Args)-1))
+	}
 
 	game.Client.OnSnapshot(func(snap *snapshot7.Snapshot, defaultAction teeworlds7.DefaultAction) {
 		char, err := game.Client.SnapFindCharacter(game.Client.LocalClientId)
@@ -161,7 +188,8 @@ func main() {
 	})
 
 	go func() {
-		game.Client.Connect("127.0.0.1", 8303)
+		fmt.Printf("connecting to %s:%d\n", game.Ip, game.Port)
+		game.Client.Connect(game.Ip, game.Port)
 	}()
 
 	if err := ebiten.RunGame(game); err != nil {
