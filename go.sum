@@ -10,6 +10,10 @@ github.com/hajimehoshi/ebiten/v2 v2.7.5 h1:jN6FnhCd9NGYCsm5GtrweuikrlyVGCSUpH5Yg
 github.com/hajimehoshi/ebiten/v2 v2.7.5/go.mod h1:H2pHVgq29rfm5yeQ7jzWOM3VHsjo7/AyucODNLOhsVY=
 github.com/jezek/xgb v1.1.1 h1:bE/r8ZZtSv7l9gk6nU0mYx51aXrvnyb44892TwSaqS4=
 github.com/jezek/xgb v1.1.1/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
+github.com/teeworlds-go/huffman v1.0.0 h1:XSNMNAJZb+njNrPACsxcDrrLDXTGjZZt35FqLAuHi4I=
+github.com/teeworlds-go/huffman v1.0.0/go.mod h1:kjaXpL6C6xL7CM+tWPNYjdEgVZB2GumKhx7rCDdXArU=
+github.com/teeworlds-go/protocol v0.0.0-20240707012613-e2851cf3343e h1:hfie3eJK0IPLMK1AkytDqnzEMc1YC3xrXU/ecSjRdzo=
+github.com/teeworlds-go/protocol v0.0.0-20240707012613-e2851cf3343e/go.mod h1:kyaOnVWqmgfOUBrHImc30H8te6jWQgr+4b1C/NHMgTE=
 golang.org/x/image v0.16.0 h1:9kloLAKhUufZhA12l5fwnx2NZW39/we1UhBesW433jw=
 golang.org/x/image v0.16.0/go.mod h1:ugSZItdV4nOxyqp56HmXwH0Ry0nBCpjnZdpDaIHdoPs=
 golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
