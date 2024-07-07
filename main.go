@@ -1,18 +1,17 @@
 package main
 
 import (
-	"log"
-	"os"
 	"image"
 	_ "image/png"
+	"log"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/teeworlds-go/protocol/messages7"
 	"github.com/teeworlds-go/protocol/snapshot7"
 	"github.com/teeworlds-go/protocol/teeworlds7"
 )
-
-
 
 const (
 	screenWidth  = 640
@@ -34,13 +33,13 @@ type CameraOffset struct {
 }
 
 func getImageFromFilePath(filePath string) (image.Image, error) {
-    f, err := os.Open(filePath)
-    if err != nil {
-        return nil, err
-    }
-    defer f.Close()
-    image, _, err := image.Decode(f)
-    return image, err
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	image, _, err := image.Decode(f)
+	return image, err
 }
 
 func init() {
@@ -64,8 +63,9 @@ func getCameraOffset(camera Camera) CameraOffset {
 }
 
 type Game struct {
-	Client teeworlds7.Client
-	Camera Camera
+	Client     teeworlds7.Client
+	Camera     Camera
+	Fullscreen bool
 }
 
 func (g *Game) Update() error {
@@ -80,6 +80,10 @@ func (g *Game) Update() error {
 		g.Client.SendMessage(&messages7.CtrlClose{})
 		os.Exit(0)
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+		g.Fullscreen = !g.Fullscreen
+		ebiten.SetFullscreen(g.Fullscreen)
+	}
 
 	return nil
 }
@@ -93,7 +97,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.069, 0.069)
-		op.GeoM.Translate(float64(screenX) - 32, float64(screenY) - 32)
+		op.GeoM.Translate(float64(screenX)-32, float64(screenY)-32)
 		screen.DrawImage(teeSprite, op)
 	}
 }
