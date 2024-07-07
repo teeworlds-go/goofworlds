@@ -27,10 +27,10 @@ const (
 )
 
 var (
-	teeSprite *ebiten.Image
+	TeeSprite *ebiten.Image
 
-	mplusFaceSource *text.GoTextFaceSource
-	mplusNormalFace *text.GoTextFace
+	MplusFaceSource *text.GoTextFaceSource
+	MplusNormalFace *text.GoTextFace
 )
 
 type Camera struct {
@@ -59,16 +59,16 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	teeSprite = ebiten.NewImageFromImage(img)
+	TeeSprite = ebiten.NewImageFromImage(img)
 
 	s, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
 	if err != nil {
 		log.Fatal(err)
 	}
-	mplusFaceSource = s
+	MplusFaceSource = s
 
-	mplusNormalFace = &text.GoTextFace{
-		Source: mplusFaceSource,
+	MplusNormalFace = &text.GoTextFace{
+		Source: MplusFaceSource,
 		Size:   24,
 	}
 }
@@ -126,7 +126,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.069, 0.069)
 		op.GeoM.Translate(float64(screenX)-32, float64(screenY)-32)
-		screen.DrawImage(teeSprite, op)
+		screen.DrawImage(TeeSprite, op)
 
 		name := g.Client.Game.Players[character.Id()].Info.Name
 		gray := color.RGBA{0x80, 0x80, 0x80, 0xff}
@@ -134,12 +134,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		{
 			x := screenX - 64
 			y := screenY - 64
-			w, h := text.Measure(name, mplusNormalFace, mplusNormalFace.Size*1.5)
+			w, h := text.Measure(name, MplusNormalFace, MplusNormalFace.Size*1.5)
 			vector.DrawFilledRect(screen, x, y, float32(w), float32(h), gray, false)
 			op := &text.DrawOptions{}
 			op.GeoM.Translate(float64(x), float64(y))
-			op.LineSpacing = mplusNormalFace.Size * 1.5
-			text.Draw(screen, name, mplusNormalFace, op)
+			op.LineSpacing = MplusNormalFace.Size * 1.5
+			text.Draw(screen, name, MplusNormalFace, op)
 		}
 	}
 
