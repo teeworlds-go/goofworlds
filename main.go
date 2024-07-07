@@ -1,20 +1,26 @@
 package main
 
 import (
-	"image/color"
 	"log"
 	"os"
+	"image"
+	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/teeworlds-go/protocol/messages7"
 	"github.com/teeworlds-go/protocol/snapshot7"
 	"github.com/teeworlds-go/protocol/teeworlds7"
 )
 
+
+
 const (
 	screenWidth  = 640
 	screenHeight = 480
+)
+
+var (
+	teeSprite *ebiten.Image
 )
 
 type Camera struct {
@@ -25,6 +31,25 @@ type Camera struct {
 type CameraOffset struct {
 	X int
 	Y int
+}
+
+func getImageFromFilePath(filePath string) (image.Image, error) {
+    f, err := os.Open(filePath)
+    if err != nil {
+        return nil, err
+    }
+    defer f.Close()
+    image, _, err := image.Decode(f)
+    return image, err
+}
+
+func init() {
+	// Preload images
+	img, err := getImageFromFilePath("img/tee.png")
+	if err != nil {
+		panic(err)
+	}
+	teeSprite = ebiten.NewImageFromImage(img)
 }
 
 func getCameraOffset(camera Camera) CameraOffset {
@@ -66,7 +91,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screenX := float32(character.X) + float32(offset.X)
 		screenY := float32(character.Y) + float32(offset.Y)
 
-		vector.DrawFilledRect(screen, screenX, screenY, 100, 100, color.RGBA{0x80, 0x80, 0x80, 0xc0}, true)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Scale(0.069, 0.069)
+		op.GeoM.Translate(float64(screenX) - 32, float64(screenY) - 32)
+		screen.DrawImage(teeSprite, op)
 	}
 }
 
