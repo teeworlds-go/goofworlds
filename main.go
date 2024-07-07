@@ -31,12 +31,12 @@ func main() {
 
 	game.Components = append(game.Components, &components.Chat{})
 
-	for _,c := range game.Components {
+	for _, c := range game.Components {
 		c.OnInit()
 	}
 
 	game.Client.OnChat(func(msg *messages7.SvChat, defaultAction teeworlds7.DefaultAction) {
-		for _,c := range game.Components {
+		for _, c := range game.Components {
 			c.OnChatMsg(msg, &game.Client)
 		}
 	})

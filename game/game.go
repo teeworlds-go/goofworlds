@@ -141,6 +141,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 	}
 
+	for _, c := range g.Components {
+		c.OnRender(screen, &g.Client)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

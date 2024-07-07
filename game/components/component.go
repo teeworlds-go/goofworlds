@@ -11,4 +11,3 @@ type Component interface {
 	OnRender(screen *ebiten.Image, client *teeworlds7.Client)
 	OnChatMsg(msg *messages7.SvChat, client *teeworlds7.Client)
 }
-
