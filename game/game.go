@@ -186,6 +186,10 @@ type Game struct {
 func (g *Game) Update() error {
 	g.Client.Game.Input.Direction = 0
 	g.Client.Game.Input.Jump = 0
+	g.Client.Game.Input.Hook = 0
+	g.Client.Game.Input.Fire = 0
+	g.Client.Game.Input.PrevWeapon = 0
+	g.Client.Game.Input.NextWeapon = 0
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		g.Client.Game.Input.Direction = -1
 	}
@@ -205,6 +209,20 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		g.Fullscreen = !g.Fullscreen
 		ebiten.SetFullscreen(g.Fullscreen)
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		g.Client.Game.Input.Fire++
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		g.Client.Game.Input.Hook = 1
+	}
+	_, dy := ebiten.Wheel()
+	// this is super cursed fast weapon switch
+	if dy > 0 {
+		g.Client.Game.Input.PrevWeapon = 1
+	}
+	if dy < 0 {
+		g.Client.Game.Input.NextWeapon = 1
 	}
 
 	g.ChatInp.Update()
@@ -246,7 +264,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.ChatInp.Draw(screen)
 
 	x, y := ebiten.CursorPosition()
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d, Y: %d", x, y))
+	aimX := x
+	aimY := y
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d, Y: %d  AimX: %d, AimY: %d", x, y, aimX, aimY))
+
+	g.Client.Game.Input.TargetX = aimX - ScreenWidth/2
+	g.Client.Game.Input.TargetY = aimY - ScreenHeight/2
+
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
