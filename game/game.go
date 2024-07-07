@@ -8,6 +8,7 @@ import (
 	_ "image/png"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -83,6 +84,91 @@ func getCameraOffset(camera Camera) CameraOffset {
 	}
 }
 
+type TextInput struct {
+	runes          []rune
+	text           string
+	counter        int
+	submitCallback func(line string)
+	active         bool
+}
+
+func (inp *TextInput) IsActive() bool {
+	return inp.active
+}
+
+func (inp *TextInput) Activate() {
+	inp.active = true
+}
+
+func (inp *TextInput) Deactivate() {
+	inp.active = false
+}
+
+func NewTextInput(submitCallback func(line string)) *TextInput {
+	return &TextInput{
+		submitCallback: submitCallback,
+	}
+}
+
+func repeatingKeyPressed(key ebiten.Key) bool {
+	const (
+		delay    = 30
+		interval = 3
+	)
+	d := inpututil.KeyPressDuration(key)
+	if d == 1 {
+		return true
+	}
+	if d >= delay && (d-delay)%interval == 0 {
+		return true
+	}
+	return false
+}
+
+func (inp *TextInput) Draw(screen *ebiten.Image) {
+	if inp.IsActive() == false {
+		return
+	}
+	t := inp.text
+	if inp.counter%60 < 30 {
+		t += "_"
+	}
+	ebitenutil.DebugPrintAt(screen, t, 10, ScreenHeight-20)
+}
+
+func (inp *TextInput) Update() error {
+	if inp.IsActive() == false {
+		return nil
+	}
+	// Add runes that are input by the user by AppendInputChars.
+	// Note that AppendInputChars result changes every frame, so you need to call this
+	// every frame.
+	inp.runes = ebiten.AppendInputChars(inp.runes[:0])
+	inp.text += string(inp.runes)
+
+	// Adjust the string to be at most 10 lines.
+	ss := strings.Split(inp.text, "\n")
+	if len(ss) > 10 {
+		inp.text = strings.Join(ss[len(ss)-10:], "\n")
+	}
+
+	// If the enter key is pressed, add a line break.
+	if repeatingKeyPressed(ebiten.KeyEnter) || repeatingKeyPressed(ebiten.KeyNumpadEnter) {
+		inp.submitCallback(inp.text)
+		inp.text = ""
+	}
+
+	// If the backspace key is pressed, remove one character.
+	if repeatingKeyPressed(ebiten.KeyBackspace) {
+		if len(inp.text) >= 1 {
+			inp.text = inp.text[:len(inp.text)-1]
+		}
+	}
+
+	inp.counter++
+	return nil
+}
+
 type Game struct {
 	Client     teeworlds7.Client
 	Camera     Camera
@@ -90,6 +176,7 @@ type Game struct {
 	Ip         string
 	Port       int
 	Components []components.Component
+	ChatInp    *TextInput
 }
 
 func (g *Game) Update() error {
@@ -108,10 +195,15 @@ func (g *Game) Update() error {
 		g.Client.SendMessage(&messages7.CtrlClose{})
 		os.Exit(0)
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyT) {
+		g.ChatInp.Activate()
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		g.Fullscreen = !g.Fullscreen
 		ebiten.SetFullscreen(g.Fullscreen)
 	}
+
+	g.ChatInp.Update()
 
 	return nil
 }
@@ -146,6 +238,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, c := range g.Components {
 		c.OnRender(screen, &g.Client)
 	}
+
+	g.ChatInp.Draw(screen)
 
 	x, y := ebiten.CursorPosition()
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d, Y: %d", x, y))
