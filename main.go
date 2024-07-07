@@ -1,13 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/teeworlds-go/protocol/messages7"
 	"github.com/teeworlds-go/protocol/snapshot7"
 	"github.com/teeworlds-go/protocol/teeworlds7"
@@ -20,6 +25,9 @@ const (
 
 var (
 	teeSprite *ebiten.Image
+
+	mplusFaceSource *text.GoTextFaceSource
+	mplusNormalFace *text.GoTextFace
 )
 
 type Camera struct {
@@ -49,6 +57,17 @@ func init() {
 		panic(err)
 	}
 	teeSprite = ebiten.NewImageFromImage(img)
+
+	s, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
+	if err != nil {
+		log.Fatal(err)
+	}
+	mplusFaceSource = s
+
+	mplusNormalFace = &text.GoTextFace{
+		Source: mplusFaceSource,
+		Size:   24,
+	}
 }
 
 func getCameraOffset(camera Camera) CameraOffset {
@@ -99,7 +118,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		op.GeoM.Scale(0.069, 0.069)
 		op.GeoM.Translate(float64(screenX)-32, float64(screenY)-32)
 		screen.DrawImage(teeSprite, op)
+
+		name := g.Client.Game.Players[character.Id()].Info.Name
+		gray := color.RGBA{0x80, 0x80, 0x80, 0xff}
+
+		{
+			x := screenX - 64
+			y := screenY - 64
+			w, h := text.Measure(name, mplusNormalFace, mplusNormalFace.Size*1.5)
+			vector.DrawFilledRect(screen, x, y, float32(w), float32(h), gray, false)
+			op := &text.DrawOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			op.LineSpacing = mplusNormalFace.Size * 1.5
+			text.Draw(screen, name, mplusNormalFace, op)
+		}
 	}
+
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
