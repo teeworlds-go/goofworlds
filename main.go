@@ -4,29 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/teeworlds-go/goofworlds/console"
 	"github.com/teeworlds-go/goofworlds/game"
 	"github.com/teeworlds-go/protocol/snapshot7"
 	"github.com/teeworlds-go/protocol/teeworlds7"
 )
-
-func ExecLine(line string, game *game.Game) {
-	if strings.HasPrefix(line, "connect ") {
-		fullIp := strings.Split(line, " ")[1]
-		game.Ip = strings.Split(fullIp, ":")[0]
-		var err error
-		game.Port, err = strconv.Atoi(strings.Split(fullIp, ":")[1])
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		fmt.Printf("unknown command: %s\n", line)
-		os.Exit(1)
-	}
-}
 
 func main() {
 	ebiten.SetWindowSize(game.ScreenWidth, game.ScreenHeight)
@@ -38,7 +22,7 @@ func main() {
 	game.Ip = "127.0.0.1"
 	game.Port = 8303
 	if len(os.Args) == 2 {
-		ExecLine(os.Args[1], game)
+		console.ExecLine(os.Args[1], game)
 	} else if len(os.Args) > 2 {
 		panic(fmt.Errorf("more than 1 cli arg not supported got %d", len(os.Args)-1))
 	}
