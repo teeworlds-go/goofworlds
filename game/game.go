@@ -201,7 +201,6 @@ func (g *Game) Update() error {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyT) {
 		g.ChatInp.Activate()
-		g.ChatInp.Clear() // cursed hack to clear the T xd
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		g.Fullscreen = !g.Fullscreen
