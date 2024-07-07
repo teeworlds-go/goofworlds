@@ -2,6 +2,7 @@ package game
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -9,6 +10,7 @@ import (
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -144,6 +146,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, c := range g.Components {
 		c.OnRender(screen, &g.Client)
 	}
+
+	x, y := ebiten.CursorPosition()
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("X: %d, Y: %d", x, y))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
