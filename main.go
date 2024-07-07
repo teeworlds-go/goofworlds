@@ -89,11 +89,15 @@ type Game struct {
 
 func (g *Game) Update() error {
 	g.Client.Game.Input.Direction = 0
+	g.Client.Game.Input.Jump = 0
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		g.Client.Game.Input.Direction = -1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		g.Client.Game.Input.Direction = 1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		g.Client.Game.Input.Jump = 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		g.Client.SendMessage(&messages7.CtrlClose{})
